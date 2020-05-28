@@ -105,9 +105,9 @@ def _preprocess_data(data):
     feature_vector_df = impute_nan(feature_vector_df)
 
     # get dummy variables for Platform Type
-    feature_vector_df['Personal or Business'] = pd.get_dummies(feature_vector_df['Personal or Business'], drop_first=True)
-    #lab_enc = preprocessing.LabelEncoder()
-    #feature_vector_df['Personal or Business'] = lab_enc.fit_transform(feature_vector_df['Personal or Business'])
+    #feature_vector_df['Personal or Business'] = pd.get_dummies(feature_vector_df['Personal or Business'], drop_first=True)
+    lab_enc = preprocessing.LabelEncoder()
+    feature_vector_df['Personal or Business'] = lab_enc.fit_transform(feature_vector_df['Personal or Business'])
     platf_dumm = pd.get_dummies(feature_vector_df['Platform Type'], prefix = 'Plat', drop_first = True)
     feature_vector_df = pd.concat([feature_vector_df, platf_dumm], axis=1)
 

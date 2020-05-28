@@ -13,6 +13,7 @@
 import pandas as pd
 import pickle
 from sklearn.ensemble import GradientBoostingRegressor
+from sklearn import preprocessing
 
 # Fetch training data and preprocess for modeling
 train = pd.read_csv('data/train_data.csv')
@@ -64,7 +65,8 @@ x_cols = list(train.drop('Time from Pickup to Arrival', axis = 1).columns)
 X = train[x_cols]
 y = train['Time from Pickup to Arrival']
 
-X['Personal or Business'] = pd.get_dummies(X['Personal or Business'], drop_first=True)
+lab_enc = preprocessing.LabelEncoder()
+X['Personal or Business'] = lab_enc.fit_transform(X['Personal or Business'])
 df1dum = pd.get_dummies(X['Platform Type'], prefix = 'Plat', drop_first = True)
 X = pd.concat([X, df1dum], axis=1)
 

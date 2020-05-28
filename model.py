@@ -97,21 +97,21 @@ def _preprocess_data(data):
     # ----------- Preprocessing steps --------
 
 
-    data = to_datetime(data)
+    feature_vector_df = to_datetime(feature_vector_df)
 
-    data.drop(columns = ['Vehicle Type', 'User Id', 'Precipitation in millimeters', 'Rider Id'], inplace = True)
+    feature_vector_df.drop(columns = ['Vehicle Type', 'User Id', 'Precipitation in millimeters', 'Rider Id'], inplace = True)
     
-    data = impute_nan(data)
+    feature_vector_df = impute_nan(feature_vector_df)
 
     # get dummy variables for Platform Type
-    data['Personal or Business'] = pd.get_dummies(data['Personal or Business'], drop_first=True)
-    platf_dumm = pd.get_dummies(data['Platform Type'], prefix = 'Plat', drop_first = True)
-    data = pd.concat([data, platf_dumm], axis=1)
+    feature_vector_df['Personal or Business'] = pd.get_dummies(feature_vector_df['Personal or Business'], drop_first=True)
+    platf_dumm = pd.get_dummies(feature_vector_df['Platform Type'], prefix = 'Plat', drop_first = True)
+    feature_vector_df = pd.concat([feature_vector_df, platf_dumm], axis=1)
 
-    data = data.set_index("Order No")
-    data.drop(columns=['Platform Type'], inplace=True)
+    feature_vector_df = feature_vector_df.set_index("Order No")
+    feature_vector_df.drop(columns=['Platform Type'], inplace=True)
 
-    predict_vector = data
+    predict_vector = feature_vector_df
     # ------------------------------------------------------------------------
 
     return predict_vector

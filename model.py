@@ -24,8 +24,44 @@
 # Helper Dependencies
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_numeric_dtype
 import pickle
 import json
+
+# function that changes timestamp to 24 hour format and converts it to seconds
+def to_datetime(input_df):
+    times = []
+    for col in input_df.columns.values:
+        if col.endswith('Time'):
+            times.append(col)
+        else:
+            pass
+    input_df[times] = input_df[times].apply(lambda x: pd.to_datetime(x, format='%I:%M:%S %p') )
+    for i in times:
+        input_df[i] = input_df[i].dt.time
+        input_df[i] = input_df[i].apply(lambda x: 3600 * int(str(x)[0:2]) + 60 * int(str(x)[3:5]) + int(str(x)[7:]))
+            
+    return input_df
+
+    # function that takes care of missing values
+def impute_nan(input_df):
+        
+    def imp_mean(d):
+        return d.fillna(round(d.mean(),1))
+        
+    def imp_mode(d):
+        A = [x for x in d if pd.notnull(x) == True]
+        most = max(list(map(A.count, A)))
+        m = sorted(list(set(filter(lambda x: A.count(x) == most, A))))
+        return d.fillna(m[0])
+        
+    for col in input_df.columns.values:
+        if is_numeric_dtype(input_df[col]) == True:
+            input_df[col] = input_df[col].transform(imp_mean)
+        else:
+            input_df[col] = input_df[col].transform(imp_mode)
+                
+    return input_df
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -58,9 +94,24 @@ def _preprocess_data(data):
     # receive marks for submitting this code in an unchanged state.
     # ---------------------------------------------------------------
 
-    # ----------- Replace this code with your own preprocessing steps --------
-    predict_vector = feature_vector_df[['Pickup Lat','Pickup Long',
-                                        'Destination Lat','Destination Long']]
+    # ----------- Preprocessing steps --------
+
+
+    data = to_datetime(data)
+
+    data.drop(columns = ['Vehicle Type', 'User Id', 'Precipitation in millimeters', 'Rider Id'], inplace = True)
+    
+    data = impute_nan(data)
+
+    # get dummy variables for Platform Type
+    data['Personal or Business'] = pd.get_dummies(data['Personal or Business'], drop_first=True)
+    platf_dumm = pd.get_dummies(data['Platform Type'], prefix = 'Plat', drop_first = True)
+    data = pd.concat([data, platf_dumm], axis=1)
+
+    data = data.set_index("Order No")
+    data.drop(columns=['Platform Type'], inplace=True)
+
+    predict_vector = data
     # ------------------------------------------------------------------------
 
     return predict_vector

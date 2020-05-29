@@ -65,13 +65,15 @@ x_cols = list(train.drop('Time from Pickup to Arrival', axis = 1).columns)
 X = train[x_cols]
 y = train['Time from Pickup to Arrival']
 
-X['Personal or Business'] = pd.get_dummies(X['Personal or Business'], drop_first=True)
+personal_dumm = pd.get_dummies(X['Personal or Business'], drop_first=True)
+X = pd.concat([X, personal_dumm], axis=1)
 df1dum = pd.get_dummies(X['Platform Type'], prefix = 'Plat', drop_first = True)
 X = pd.concat([X, df1dum], axis=1)
 
 X.reset_index(drop=True, inplace=True)
 X.set_index('Order No', inplace = True)
 X.drop(columns=['Platform Type'], inplace = True)
+X.drop(columns=['Personal or Business'], inplace=True)
 
 from sklearn.model_selection import train_test_split
 # split into train and test

@@ -105,12 +105,14 @@ def _preprocess_data(data):
     feature_vector_df = impute_nan(feature_vector_df)
 
     # get dummy variables for Platform Type
-    feature_vector_df['Personal or Business'][0] = pd.get_dummies(feature_vector_df['Personal or Business'], drop_first=True)
+    personal_dumm = pd.get_dummies(feature_vector_df['Personal or Business'], drop_first=True)
+    feature_vector_df = pd.concat([feature_vector_df, personal_dumm], axis=1)
     platf_dumm = pd.get_dummies(feature_vector_df['Platform Type'], prefix = 'Plat', drop_first = True)
     feature_vector_df = pd.concat([feature_vector_df, platf_dumm], axis=1)
 
     feature_vector_df = feature_vector_df.set_index("Order No")
     feature_vector_df.drop(columns=['Platform Type'], inplace=True)
+    feature_vector_df.drop(columns=['Personal or Business'], inplace=True)
 
     predict_vector = feature_vector_df
     # ------------------------------------------------------------------------

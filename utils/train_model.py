@@ -65,8 +65,7 @@ x_cols = list(train.drop('Time from Pickup to Arrival', axis = 1).columns)
 X = train[x_cols]
 y = train['Time from Pickup to Arrival']
 
-lab_enc = preprocessing.LabelEncoder()
-X['Personal or Business'] = lab_enc.fit_transform(X['Personal or Business'])
+X['Personal or Business'] = pd.get_dummies(X['Personal or Business'], drop_first=True)
 df1dum = pd.get_dummies(X['Platform Type'], prefix = 'Plat', drop_first = True)
 X = pd.concat([X, df1dum], axis=1)
 

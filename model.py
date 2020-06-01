@@ -44,6 +44,26 @@ def to_datetime(input_df):
             
     return input_df
 
+    # function that takes care of missing values
+def impute_nan(input_df):
+        
+    def imp_mean(d):
+        return d.fillna(round(d.mean(),1))
+        
+    def imp_mode(d):
+        A = [x for x in d if pd.notnull(x) == True]
+        most = max(list(map(A.count, A)))
+        m = sorted(list(set(filter(lambda x: A.count(x) == most, A))))
+        return d.fillna(m[0])
+        
+    for col in input_df.columns.values:
+        if is_numeric_dtype(input_df[col]) == True:
+            input_df[col] = input_df[col].transform(imp_mean)
+        else:
+            input_df[col] = input_df[col].transform(imp_mode)
+                
+    return input_df
+
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
 
@@ -81,8 +101,8 @@ def _preprocess_data(data):
     feature_vector_df = to_datetime(feature_vector_df)
 
     feature_vector_df.drop(columns = ['Vehicle Type', 'User Id', 'Precipitation in millimeters', 'Rider Id'], inplace = True)
-    feature_vector_df['Temperature'] = feature_vector_df['Temperature'].fillna(feature_vector_df['Temperature'].mean())
-    #feature_vector_df = impute_nan(feature_vector_df)
+    
+    feature_vector_df = impute_nan(feature_vector_df)
 
     # get dummy variables for Platform Type
     personal_dumm = pd.get_dummies(feature_vector_df['Personal or Business'], drop_first=True)

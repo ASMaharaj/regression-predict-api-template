@@ -218,7 +218,7 @@ cd utils/
     Change the value of the `url` variable to reflect the ***public IP address*** of the Host. (Instructions for getting the public IP address are provided within the *‘Introduction to Amazon AWS - Part I’* train on Athena.)
 
 ```bash
-url = 'http://{public-ip-address-of-remote-machine}:5000/api_v0.1'
+url = 'http://34.242.166.100:5000/api_v0.1'
 ```   
 
 7. Once the editing is completed, close the file and run it:
